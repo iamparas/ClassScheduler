@@ -2,20 +2,37 @@ package classscheduler;
 
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 import org.jgraph.graph.DefaultEdge;
 import org.jgrapht.WeightedGraph;
 import org.jgrapht.alg.MaximumWeightBipartiteMatching;
+import org.jgrapht.graph.ClassBasedEdgeFactory;
 import org.jgrapht.graph.SimpleWeightedGraph;
 
 public class Handler {
-	public static class RelationshipEdge<V> extends DefaultEdge{
+	public static class RelationshipEdge<Block> extends DefaultEdge{
+		private CourseBlock v1;
+		private RoomBlock v2;
+		public RelationshipEdge(Block v1, Block v2){
+			this.v1 = (CourseBlock) v1;
+			this.v2 = (RoomBlock) v2;
+		}
 		
+		public String toString(){
+			return String.format("%s -> %s", v1.toString(), v2.toString());
+		}
+		
+		public boolean isCompatible(){
+			return v1.getMaxEnrollment() <= v2.getMaxCapacity() && !v2.isReserved();
+		}
 	}
+	
+	
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
@@ -72,21 +89,19 @@ public class Handler {
 					block.addCourse(CourseQueue.get(j), new TTH());
 				}
 			}
-			
 			courseBlocks.add(block);
 		}
 		
 		
-		WeightedGraph<Block, DefaultEdge> courseGraph = new SimpleWeightedGraph<Block, DefaultEdge>(DefaultEdge.class);
+		WeightedGraph<Block, RelationshipEdge> courseGraph = new SimpleWeightedGraph<Block, RelationshipEdge>(new ClassBasedEdgeFactory<Block, RelationshipEdge>(RelationshipEdge.class));
 		for(Block block : courseBlocks){
 			courseGraph.addVertex(block);
 		}
 		
 		
 		
-		
-		Set<RoomBlock> roomBlocks = new HashSet<RoomBlock>();
-		String[] rooms = {"PJ121", "PJ122", "PJ123", "PJ124", "PJ221", "PJ222", "PJ223", "PJ322", "PJ323"};
+		Set<RoomBlock> roomBlocks = new LinkedHashSet<RoomBlock>();
+		String[] rooms = {"PJ121", "PJ122", "PJ123", "PJ124", "PJ221"};
 		int[] roomsSize= {20, 30, 50, 30, 20, 40, 20, 30, 35};
 		int[] times = {8, 10, 12, 1, 3, 5};
 		
@@ -104,19 +119,23 @@ public class Handler {
 		}
 		
 		
-		
+		HashMap<RoomBlock,CourseBlock> unavailableRoomBlocks = new HashMap<RoomBlock, CourseBlock>();
 		for(CourseBlock courseBlock : courseBlocks){
 			for(RoomBlock roomBlock : roomBlocks){
+					
+					RelationshipEdge<Block> edge = new RelationshipEdge<Block>(courseBlock, roomBlock);
+					if(edge.isCompatible()){
+						courseGraph.addEdge(courseBlock, roomBlock, edge);
+					}
+					
 				
-				if(courseBlock.getMaxEnrollment() <= roomBlock.getMaxCapacity()){
-					courseGraph.addEdge(courseBlock, roomBlock);
-				}
 			}
 		}
 		System.out.println(courseGraph.edgeSet());
 		MaximumWeightBipartiteMatching maxWeightMatch = new MaximumWeightBipartiteMatching(courseGraph, courseBlocks, roomBlocks);
 		
 		System.out.println(maxWeightMatch.getMatching());
+		
 		//Block of classes
 		// Block of classes 8:00 - 10:00 / 10:00 - 12:00 / 1:00 - 3:00 / 3:00 - 5:00 
 		// Block List<Room[(start-time - end-time), room number, roomsize]>

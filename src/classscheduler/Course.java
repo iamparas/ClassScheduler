@@ -5,6 +5,7 @@ public class Course {
 	private String courseNumber;
 	private int creditHour;
 	private int maxAllowedEnrollment;
+	private String assignedProfessor;
 	
 	public Course(String courseName, String courseNumber, int creditHour,int  maxAllowedEnrollment){
 		this.courseName  = courseName;
@@ -21,8 +22,20 @@ public class Course {
 		return maxAllowedEnrollment;
 	}
 	
+	public void setMaxAllowedEnrollment(int maxAllowedEnrollment){
+		this.maxAllowedEnrollment = maxAllowedEnrollment;
+	}
+	
+	public String getAssignedProfessor(){
+		return assignedProfessor;
+	}
+	
+	public void setAssignedProfessor(String professor){
+		this.assignedProfessor = professor;
+	}
+	
 	public String toString(){
-		return String.format("%s", courseName);
+		return String.format("%s", courseNumber);
 	}
 	
 	
