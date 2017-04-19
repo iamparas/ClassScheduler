@@ -1,0 +1,3 @@
+2017/03/21-00:00:28.930 56323 Reusing MANIFEST /Users/parash/Documents/projects/appengine-endpoints-helloworld-java-maven/test/Default/data_reduction_proxy_leveldb/MANIFEST-000001
+2017/03/21-00:00:28.930 56323 Recovering log #3
+2017/03/21-00:00:28.931 56323 Reusing old log /Users/parash/Documents/projects/appengine-endpoints-helloworld-java-maven/test/Default/data_reduction_proxy_leveldb/000003.log 
